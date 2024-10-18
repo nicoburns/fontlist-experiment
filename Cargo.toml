@@ -1,0 +1,10 @@
+[package]
+name = "fontlist"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+core-text = "21.0.0"
+font-types = "0.7.2"
+memmap2 = "0.9.5"
+skrifa = "0.23.0"
