@@ -2,20 +2,17 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
 
-use std::time::Instant;
 use font_types::NameId;
 use memmap2::Mmap;
 use skrifa::raw::{FileRef, TableProvider};
+use std::time::Instant;
 
 fn main() {
     println!("Enumerating fonts using CoreText...");
 
-    for_each_system_font(|ident| {
-        // Ignore non-collection
-        if !ident.path.ends_with("ttc") {
-            return;
-        }
+    let mut name = String::with_capacity(100);
 
+    for_each_system_font(|ident| {
         let start = Instant::now();
 
         let file = std::fs::File::open(&ident.path).unwrap();
@@ -33,11 +30,12 @@ fn main() {
                         .iter()
                         .filter(|record| record.name_id() == NameId::POSTSCRIPT_NAME)
                         .any(|record| {
-                            let name: String = record
+                            name.clear();
+                            record
                                 .string(name_table.string_data())
                                 .unwrap()
                                 .chars()
-                                .collect();
+                                .for_each(|c| name.push(c));
                             &name == &ident.postscript_name
                         })
                     {
@@ -100,4 +98,3 @@ pub fn for_each_variation(family_name: &str, mut callback: impl FnMut(FontIdenti
 pub fn for_each_system_font(mut callback: impl FnMut(FontIdentifier)) {
     for_each_available_family(|family_name| for_each_variation(&family_name, &mut callback));
 }
-
