@@ -12,6 +12,8 @@ fn main() {
 
     let mut name = String::with_capacity(100);
 
+    let overall_start = Instant::now();
+
     for_each_system_font(|ident| {
         let start = Instant::now();
 
@@ -57,6 +59,9 @@ fn main() {
             ident.postscript_name, index, ident.path, time
         );
     });
+
+    let time = Instant::now().duration_since(overall_start).as_millis();
+    println!("\nEnumerated all fonts in {}ms", time);
 }
 
 /// An identifier for a local font on a MacOS system. These values comes from the CoreText
